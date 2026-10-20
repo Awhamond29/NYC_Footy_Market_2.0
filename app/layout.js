@@ -2,9 +2,25 @@ import './globals.css';
 import { AuthProvider } from './providers';
 import Header from '@/components/Header';
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://nyc-footy-market.vercel.app';
+const DESCRIPTION =
+  'NYC Footy Market: find a goalkeeper or outfielder for your New York City soccer game, or find a game to join. Free to use.';
+
 export const metadata = {
-  title: 'NYC Footy Market',
-  description: 'Find a keeper or outfielder for your NYC soccer game, or find a game to join.',
+  metadataBase: new URL(SITE),
+  title: 'NYC Footy Market | Find NYC soccer players and games',
+  description: DESCRIPTION,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'NYC Footy Market',
+    description: DESCRIPTION,
+    url: SITE,
+    siteName: 'NYC Footy Market',
+    type: 'website',
+  },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
 };
 
 export const viewport = {
