@@ -19,10 +19,13 @@ export default function Header() {
     <header className="top">
       <div className="wrap">
         <div className="brand">
-          <div>
-            <Link href="/" className="logo">
-              NYC Footy <span>Market</span>
-            </Link>
+          <div style={{ minWidth: 0 }}>
+            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 8 }}>
+              <Link href="/" className="logo">
+                NYC Footy <span>Market</span>
+              </Link>
+              <span className="beta">Beta</span>
+            </div>
             <div className="tag">Short a keeper at Pier 40? Find one before kickoff.</div>
           </div>
           {session === null ? (

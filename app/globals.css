@@ -31,6 +31,7 @@ header.top { position: sticky; top: 0; z-index: 5; background: var(--header); co
 .brand { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px 4px; }
 .logo { font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: .02em; text-transform: uppercase; line-height: 1; color: #fff; text-decoration: none; }
 .logo span { color: var(--bib); }
+.beta { display: inline-block; font: 700 10px var(--body); letter-spacing: .12em; text-transform: uppercase; color: #fff; border: 1px solid rgb(255 255 255 / .6); border-radius: 4px; padding: 2px 5px; }
 .tag { font-size: 12px; opacity: .85; }
 nav.tabs { display: flex; gap: 4px; overflow-x: auto; padding-block: 8px 0; scrollbar-width: none; }
 nav.tabs a { font: 600 14px var(--body); color: #fff; opacity: .75; padding: 10px 14px; border-bottom: 3px solid transparent; white-space: nowrap; text-decoration: none; }
@@ -74,7 +75,7 @@ button.card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgb(0 0 
 .day.on { background: var(--pitch); border-color: var(--pitch); color: var(--on-pitch); }
 
 /* Buttons */
-.btn { font: 700 14px var(--body); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--bib); color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.btn { white-space: nowrap; font: 700 14px var(--body); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--bib); color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .btn.dark { background: var(--ink); color: var(--bg); }
 .btn.block { width: 100%; }
@@ -167,4 +168,5 @@ dl.facts dd { margin: 0; }
 
 .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 600; font-size: 14px; z-index: 30; max-width: calc(100% - 32px); text-align: center; }
 
+@media (max-width: 400px) { .logo { font-size: 23px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
