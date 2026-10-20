@@ -1,4 +1,4 @@
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://nyc-footy-market.vercel.app';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nycfootymarket.com';
 
 // Public pages Google should list. Signed-in pages are left out.
 export default function sitemap() {

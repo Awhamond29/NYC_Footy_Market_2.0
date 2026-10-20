@@ -2,7 +2,7 @@ import './globals.css';
 import { AuthProvider } from './providers';
 import Header from '@/components/Header';
 
-const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://nyc-footy-market.vercel.app';
+const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nycfootymarket.com';
 const DESCRIPTION =
   'NYC Footy Market: find a goalkeeper or outfielder for your New York City soccer game, or find a game to join. Free to use.';
 
