@@ -218,22 +218,33 @@ function ProfileForm() {
                 id="pf-price"
                 min="0"
                 max="100"
-                step="5"
-                value={f.price}
+                step="1"
+                value={Math.min(f.price, 100)}
                 onChange={(e) => setF({ ...f, price: Number(e.target.value) })}
-                aria-label="Asking price"
+                aria-label="Asking price slider"
               />
-              <div className={`price ${f.price ? '' : 'free'}`}>
-                {f.price ? (
-                  <>
-                    ${f.price}
-                    <small>/game</small>
-                  </>
-                ) : (
-                  'Free'
-                )}
+              <div className="priceinput">
+                <span>$</span>
+                <input
+                  type="number"
+                  id="pf-price-exact"
+                  inputMode="numeric"
+                  min="0"
+                  max="500"
+                  step="1"
+                  value={f.price}
+                  onChange={(e) => {
+                    const n = Math.round(Number(e.target.value));
+                    setF({ ...f, price: Number.isFinite(n) ? Math.max(0, Math.min(500, n)) : 0 });
+                  }}
+                  aria-label="Asking price in dollars"
+                />
+                <small>{f.price ? '/game' : 'Free'}</small>
               </div>
             </div>
+            <p className="note" style={{ margin: 0 }}>
+              Drag the slider or type an exact amount. Set $0 to play for free.
+            </p>
           </div>
 
           <label className="switch" htmlFor="pf-adult">
