@@ -87,7 +87,7 @@ export default function Login() {
       {sent ? (
         <form onSubmit={verifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 10 }} noValidate>
           <p style={{ margin: 0 }}>
-            We emailed <strong>{email}</strong>. Click the link in it, or type the code from the email here.
+            We emailed <strong>{email}</strong>. Type the code from the email here, or click the link in it. It can take a minute, and new senders often land in <strong>Junk</strong> or <strong>Spam</strong>, so check there too.
           </p>
           <div className="field">
             <label htmlFor="code">Sign-in code</label>
@@ -97,7 +97,7 @@ export default function Login() {
               autoComplete="one-time-code"
               value={code}
               onChange={(e) => setCode(e.target.value)}
-              placeholder="123456"
+              placeholder="Code from the email"
               maxLength={12}
             />
           </div>
@@ -105,7 +105,7 @@ export default function Login() {
             {busy ? 'Checking…' : 'Sign in with code'}
           </button>
           <p className="note" style={{ margin: 0 }}>
-            Nothing arrived? Check spam, or{' '}
+            Still nothing after a few minutes?{' '}
             <button className="link" type="button" onClick={() => { setSent(false); setCode(''); setError(''); }}>
               send it again
             </button>
