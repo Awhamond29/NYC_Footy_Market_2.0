@@ -39,6 +39,9 @@ You'll create three free accounts: **Supabase**, **GitHub** and **Vercel**.
 2. Open `supabase/schema.sql` from this folder, copy everything, paste it in, and click **Run**.
 3. You should see "Success. No rows returned." That created every table, privacy rule, the photo bucket and live updates.
 
+### 2b. Load the reviews feature
+Also run `supabase/002_reviews.sql` the same way (SQL Editor → New query → paste → Run). It adds player reviews and ratings.
+
 ### 3. Copy your two keys
 In Supabase go to **Project Settings → API Keys** (on some projects it's **Settings → API**). Copy:
 - **Project URL**: looks like `https://abcdefgh.supabase.co`

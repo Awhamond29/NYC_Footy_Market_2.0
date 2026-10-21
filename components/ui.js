@@ -40,7 +40,22 @@ export function Days({ days = [], short = true }) {
   );
 }
 
-export function PlayerCard({ p, isMe, onClick, as = 'button' }) {
+// Short line for cards: "★ 4.8 · 12 reviews"
+export function RatingLine({ stats }) {
+  if (!stats || !stats.review_count) return <span className="rating none">No reviews yet</span>;
+  return (
+    <span className="rating">
+      <span className="star">★</span> {Number(stats.avg_rating).toFixed(1)}
+      <span className="meta">
+        {' '}
+        · {stats.review_count} review{stats.review_count === 1 ? '' : 's'}
+        {stats.no_shows ? ` · ${stats.no_shows} no-show${stats.no_shows === 1 ? '' : 's'}` : ''}
+      </span>
+    </span>
+  );
+}
+
+export function PlayerCard({ p, isMe, onClick, as = 'button', stats, showRating = true }) {
   const Tag = as;
   return (
     <Tag className="card" onClick={onClick} type={as === 'button' ? 'button' : undefined}>
@@ -55,8 +70,9 @@ export function PlayerCard({ p, isMe, onClick, as = 'button' }) {
           </div>
         </div>
       </div>
-      <div>
+      <div className="row" style={{ justifyContent: 'space-between', gap: 8, flexWrap: 'wrap' }}>
         <PosBadge pos={p.position} />
+        {showRating ? <RatingLine stats={stats} /> : null}
       </div>
       <p className="summary">{p.bio || 'No summary yet.'}</p>
       <div className="cardfoot">

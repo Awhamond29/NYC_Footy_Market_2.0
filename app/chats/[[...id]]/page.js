@@ -6,7 +6,8 @@ import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
-import { Avatar } from '@/components/ui';
+import { Avatar, Modal } from '@/components/ui';
+import { ReviewsSection } from '@/components/Reviews';
 import { firstName, msgTime } from '@/lib/format';
 
 export default function ChatsPage() {
@@ -103,6 +104,9 @@ function Conversation({ convo, other, onRead }) {
   const [text, setText] = useState('');
   const [error, setError] = useState('');
   const [sending, setSending] = useState(false);
+  const [canReview, setCanReview] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
+  const [otherStats, setOtherStats] = useState(null);
   const listRef = useRef();
   const inputRef = useRef();
 
@@ -160,6 +164,21 @@ function Conversation({ convo, other, onRead }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convo.id, user.id]);
 
+  // Once you've both messaged, offer a review button (e.g. after the game).
+  const otherId = other?.id;
+  const theyReplied = (messages ?? []).some((m) => m.sender_id !== user.id);
+  const iWrote = (messages ?? []).some((m) => m.sender_id === user.id);
+  useEffect(() => {
+    if (!otherId || !theyReplied || !iWrote) return;
+    supabase.rpc('can_review', { target: otherId }).then(({ data }) => setCanReview(Boolean(data)));
+  }, [otherId, theyReplied, iWrote]);
+
+  const openReview = async () => {
+    const { data } = await supabase.from('review_stats').select('*').eq('player_id', otherId).maybeSingle();
+    setOtherStats(data ?? null);
+    setReviewing(true);
+  };
+
   useEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTop = el.scrollHeight;
@@ -203,7 +222,21 @@ function Conversation({ convo, other, onRead }) {
               : [other?.position === 'GK' ? 'Goalkeeper' : 'Outfielder', other?.area].filter(Boolean).join(' · ')}
           </div>
         </div>
+        {canReview ? (
+          <button className="btn ghost sm" type="button" onClick={openReview} style={{ marginLeft: 'auto' }}>
+            ★ Review
+          </button>
+        ) : null}
       </div>
+      {reviewing && other ? (
+        <Modal onClose={() => setReviewing(false)} label={`Review ${other.name}`}>
+          <div className="row">
+            <Avatar name={other.name} photo={other.photo_url} />
+            <h2>{other.name}</h2>
+          </div>
+          <ReviewsSection player={other} stats={otherStats} onChanged={openReview} />
+        </Modal>
+      ) : null}
       <div className="msgs" ref={listRef}>
         {messages === null ? <div className="empty">Loading…</div> : null}
         {messages && messages.length === 0 ? (

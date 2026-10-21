@@ -74,6 +74,25 @@ button.card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgb(0 0 
 .day { font: 600 11px var(--mono); padding: 4px 7px; border-radius: 6px; border: 1px solid var(--line); color: var(--muted); }
 .day.on { background: var(--pitch); border-color: var(--pitch); color: var(--on-pitch); }
 
+/* Ratings and reviews */
+.rating { font: 600 13px var(--body); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rating .star { color: var(--bib); }
+.rating .meta { font-weight: 500; }
+.rating.none { color: var(--muted); font-weight: 500; }
+.stars { color: var(--bib); letter-spacing: 1px; line-height: 1; }
+.stars .off { color: var(--line); }
+.reviews { display: flex; flex-direction: column; gap: 10px; padding: 12px 0; border-block: 1px solid var(--line); }
+.reviewlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-height: 320px; overflow: auto; }
+.av.xs { width: 32px; height: 32px; font-size: 13px; }
+.tagpill { font: 600 10px var(--body); letter-spacing: .06em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; }
+.tagpill.ok { background: var(--pitch-soft); color: var(--pitch); }
+.tagpill.bad { background: var(--bib-soft); color: var(--danger); }
+.reviewform { display: flex; flex-direction: column; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+.starpick { display: flex; gap: 4px; }
+.starpick button { font-size: 30px; line-height: 1; background: none; border: 0; padding: 2px; cursor: pointer; color: var(--line); }
+.starpick button.on { color: var(--bib); }
+.btn.sm { padding: 6px 10px; font-size: 13px; }
+
 /* Buttons */
 .btn { white-space: nowrap; font: 700 14px var(--body); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--bib); color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }

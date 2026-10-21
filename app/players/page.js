@@ -7,6 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, CopyLine, Days, Modal, PlayerCard, PosBadge, Price } from '@/components/ui';
+import { ReviewsSection } from '@/components/Reviews';
 import { firstName } from '@/lib/format';
 
 const FILTERS = [
@@ -30,12 +31,20 @@ function Players() {
   const [pos, setPos] = useState('all');
   const [sort, setSort] = useState('desc');
   const [open, setOpen] = useState(null);
+  const [stats, setStats] = useState({});
+
+  const loadStats = useCallback(async () => {
+    // Ratings are optional: if the reviews table isn't set up yet, cards just show no rating.
+    const { data } = await supabase.from('review_stats').select('*');
+    setStats(Object.fromEntries((data ?? []).map((s) => [s.player_id, s])));
+  }, []);
 
   const load = useCallback(async () => {
     const { data, error } = await supabase.from('profiles').select('*').eq('listed', true).limit(500);
     if (error) setError('Couldn’t load players. Check your connection and refresh.');
     else setPlayers(data);
-  }, []);
+    loadStats();
+  }, [loadStats]);
 
   useEffect(() => {
     load();
@@ -43,8 +52,13 @@ function Players() {
 
   const shown = useMemo(() => {
     const list = (players ?? []).filter((p) => pos === 'all' || p.position === pos);
+    if (sort === 'rating') {
+      // Best average first; players with more reviews win ties; unrated players go last.
+      const score = (p) => stats[p.id] ? Number(stats[p.id].avg_rating) * 1000 + stats[p.id].review_count : -1;
+      return list.sort((a, b) => score(b) - score(a));
+    }
     return list.sort((a, b) => (sort === 'desc' ? b.price - a.price : a.price - b.price));
-  }, [players, pos, sort]);
+  }, [players, pos, sort, stats]);
 
   return (
     <section>
@@ -65,6 +79,7 @@ function Players() {
         <select className="auto" value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort players">
           <option value="desc">Price: most expensive</option>
           <option value="asc">Price: least expensive</option>
+          <option value="rating">Top rated</option>
         </select>
       </div>
 
@@ -81,16 +96,18 @@ function Players() {
 
       <div className="grid">
         {shown.map((p) => (
-          <PlayerCard key={p.id} p={p} isMe={p.id === user.id} onClick={() => setOpen(p)} />
+          <PlayerCard key={p.id} p={p} stats={stats[p.id]} isMe={p.id === user.id} onClick={() => setOpen(p)} />
         ))}
       </div>
 
-      {open ? <PlayerModal p={open} isMe={open.id === user.id} onClose={() => setOpen(null)} /> : null}
+      {open ? (
+        <PlayerModal p={open} stats={stats[open.id]} isMe={open.id === user.id} onClose={() => setOpen(null)} onReviewed={loadStats} />
+      ) : null}
     </section>
   );
 }
 
-function PlayerModal({ p, isMe, onClose }) {
+function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
   const router = useRouter();
   const { toast, profile } = useAuth();
   const [contact, setContact] = useState(null);
@@ -165,6 +182,7 @@ function PlayerModal({ p, isMe, onClose }) {
         <Price value={p.price} />
         <Days days={p.days} short={false} />
       </div>
+      <ReviewsSection player={p} stats={stats} onChanged={onReviewed} />
       {p.bio ? <p style={{ margin: 0 }}>{p.bio}</p> : null}
       <dl className="facts">
         <dt>Plays</dt>

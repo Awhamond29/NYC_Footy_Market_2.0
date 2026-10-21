@@ -267,7 +267,7 @@ function ProfileForm() {
 
         <div className="panel stick">
           <span className="lbl">Preview: how your card looks</span>
-          <PlayerCard p={{ ...f, name: f.name || 'Your name' }} isMe as="div" />
+          <PlayerCard p={{ ...f, name: f.name || 'Your name' }} isMe as="div" showRating={false} />
           <p className="note" style={{ margin: 0 }}>
             Signed in as {user.email}.{' '}
             <button className="link" type="button" onClick={signOut}>
