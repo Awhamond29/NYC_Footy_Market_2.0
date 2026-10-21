@@ -33,7 +33,10 @@ export default function AuthCallback() {
   if (failed) {
     return (
       <div className="empty">
-        <p>That sign-in link didn&apos;t work. It may have expired or been opened in a different browser.</p>
+        <p style={{ maxWidth: '46ch' }}>
+          That sign-in link didn&apos;t work. Links only work in the same browser you requested them from, and
+          each one works once. Go back to sign in and type the code from the email instead.
+        </p>
         <Link href="/login" className="btn">
           Try again
         </Link>

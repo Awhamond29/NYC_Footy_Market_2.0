@@ -13,6 +13,7 @@ export default function Login() {
   const [sent, setSent] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [code, setCode] = useState('');
 
   useEffect(() => {
     if (session) router.replace('/players');
@@ -46,6 +47,26 @@ export default function Login() {
     else setSent(true);
   };
 
+  // Works on any device: type the code from the email instead of clicking the link.
+  const verifyCode = async (e) => {
+    e.preventDefault();
+    setError('');
+    const token = code.replace(/\s/g, '');
+    if (!/^\d{6,10}$/.test(token)) {
+      setError('Enter the code from the email (numbers only).');
+      return;
+    }
+    setBusy(true);
+    const { data, error } = await supabase.auth.verifyOtp({ email: email.trim(), token, type: 'email' });
+    setBusy(false);
+    if (error) {
+      setError('That code didn’t work. It may have expired, so send a new one and use the latest email.');
+      return;
+    }
+    const { data: p } = await supabase.from('profiles').select('is_adult').eq('id', data.user.id).maybeSingle();
+    router.replace(p?.is_adult ? '/players' : '/profile?welcome=1');
+  };
+
   if (!isConfigured) return <SetupNotice />;
 
   return (
@@ -64,9 +85,33 @@ export default function Login() {
       </div>
 
       {sent ? (
-        <p style={{ margin: 0 }}>
-          Check <strong>{email}</strong> for a sign-in link. You can close this tab once you&apos;ve clicked it.
-        </p>
+        <form onSubmit={verifyCode} style={{ display: 'flex', flexDirection: 'column', gap: 10 }} noValidate>
+          <p style={{ margin: 0 }}>
+            We emailed <strong>{email}</strong>. Click the link in it, or type the code from the email here.
+          </p>
+          <div className="field">
+            <label htmlFor="code">Sign-in code</label>
+            <input
+              id="code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="123456"
+              maxLength={12}
+            />
+          </div>
+          <button className="btn block" type="submit" disabled={busy}>
+            {busy ? 'Checking…' : 'Sign in with code'}
+          </button>
+          <p className="note" style={{ margin: 0 }}>
+            Nothing arrived? Check spam, or{' '}
+            <button className="link" type="button" onClick={() => { setSent(false); setCode(''); setError(''); }}>
+              send it again
+            </button>
+            .
+          </p>
+        </form>
       ) : (
         <form onSubmit={sendLink} style={{ display: 'flex', flexDirection: 'column', gap: 10 }} noValidate>
           <div className="field">
