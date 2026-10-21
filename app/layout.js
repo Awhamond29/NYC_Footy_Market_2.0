@@ -1,4 +1,5 @@
 import './globals.css';
+import { Analytics } from '@vercel/analytics/next';
 import { AuthProvider } from './providers';
 import Header from '@/components/Header';
 
@@ -46,6 +47,7 @@ export default function RootLayout({ children }) {
           <Header />
           <main className="wrap">{children}</main>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
