@@ -63,13 +63,13 @@ function ProfileForm() {
     try {
       const blob = await squareJpeg(file);
       const path = `${user.id}/${Date.now()}.jpg`;
-      const { error } = await supabase.storage.from('avatars').upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+      const { error } = await supabase.storage.from('avatars').upload(path, blob, { contentType: 'image/jpeg' });
       if (error) throw error;
       const { data } = supabase.storage.from('avatars').getPublicUrl(path);
       setF((cur) => ({ ...cur, photo_url: data.publicUrl }));
       toast('Photo added. Save to keep it.');
     } catch (err) {
-      setError(err.message || 'Photo upload failed. Try a different image.');
+      setError(err.message?.startsWith('That file') ? err.message : 'Photo upload failed. Try again, or pick a different photo.');
     } finally {
       setUploading(false);
     }
@@ -143,7 +143,7 @@ function ProfileForm() {
             <Avatar name={f.name || 'You'} photo={f.photo_url} size="lg" />
             <div className="field" style={{ flex: 1 }}>
               <label htmlFor="pfPhoto">{uploading ? 'Uploading…' : 'Photo'}</label>
-              <input type="file" id="pfPhoto" accept="image/*" onChange={upload} disabled={uploading} />
+              <input type="file" id="pfPhoto" accept="image/*,.heic,.heif" onChange={upload} disabled={uploading} />
             </div>
           </div>
 
