@@ -8,6 +8,8 @@ import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, Modal } from '@/components/ui';
 import { ReviewsSection } from '@/components/Reviews';
+import AppSetup from '@/components/AppSetup';
+import { notifyRecipient } from '@/lib/push';
 import { firstName, msgTime } from '@/lib/format';
 
 export default function ChatsPage() {
@@ -54,6 +56,7 @@ function Chats() {
   return (
     <section>
       <h1 style={{ marginBottom: 16 }}>Chats</h1>
+      <AppSetup variant="banner" />
       <div className={`chat ${activeId ? 'open' : ''}`}>
         <div className="threads">
           {convos === null ? <div className="empty">Loading…</div> : null}
@@ -202,6 +205,7 @@ function Conversation({ convo, other, onRead }) {
     }
     setText('');
     setMessages((m) => (m && !m.some((x) => x.id === data.id) ? [...m, data] : m));
+    notifyRecipient(data.id);
     onRead();
   };
 

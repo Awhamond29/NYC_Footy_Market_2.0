@@ -12,6 +12,8 @@ export const metadata = {
   title: 'NYC Footy Market | Find NYC soccer players and games',
   description: DESCRIPTION,
   alternates: { canonical: '/' },
+  applicationName: 'NYC Footy Market',
+  appleWebApp: { capable: true, title: 'Footy Market', statusBarStyle: 'black-translucent' },
   openGraph: {
     title: 'NYC Footy Market',
     description: DESCRIPTION,

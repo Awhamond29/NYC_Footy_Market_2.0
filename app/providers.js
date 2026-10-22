@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { registerServiceWorker } from '@/lib/push';
 
 const AuthContext = createContext(null);
 
@@ -15,6 +16,7 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [unread, setUnread] = useState(0);
   const [toastText, setToastText] = useState('');
+  const [installPrompt, setInstallPrompt] = useState(null);
   const toastTimer = useRef();
 
   const user = session?.user ?? null;
@@ -67,13 +69,36 @@ export function AuthProvider({ children }) {
     };
   }, [uid, refreshUnread]);
 
+  // App install (Android/desktop Chrome offer a native prompt; iPhone uses Share → Add to Home Screen).
+  useEffect(() => {
+    registerServiceWorker();
+    const onPrompt = (e) => {
+      e.preventDefault();
+      setInstallPrompt(e);
+    };
+    const onInstalled = () => setInstallPrompt(null);
+    window.addEventListener('beforeinstallprompt', onPrompt);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onPrompt);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
+
+  const installApp = useCallback(async () => {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    await installPrompt.userChoice.catch(() => null);
+    setInstallPrompt(null);
+  }, [installPrompt]);
+
   const toast = useCallback((text) => {
     setToastText(text);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToastText(''), 2600);
   }, []);
 
-  const value = { session, user, profile, refreshProfile, unread, refreshUnread, toast };
+  const value = { session, user, profile, refreshProfile, unread, refreshUnread, toast, installPrompt, installApp };
 
   return (
     <AuthContext.Provider value={value}>

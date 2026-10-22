@@ -42,6 +42,9 @@ You'll create three free accounts: **Supabase**, **GitHub** and **Vercel**.
 ### 2b. Load the reviews feature
 Also run `supabase/002_reviews.sql` the same way (SQL Editor → New query → paste → Run). It adds player reviews and ratings.
 
+### 2c. Load message notifications
+Also run `supabase/003_push.sql`. Then add three more environment variables in Vercel (see "Message notifications" below).
+
 ### 3. Copy your two keys
 In Supabase go to **Project Settings → API Keys** (on some projects it's **Settings → API**). Copy:
 - **Project URL**: looks like `https://abcdefgh.supabase.co`
@@ -83,6 +86,14 @@ Open your link in a normal window and in a private window. Sign in as two differ
 Buy `nycfootymarket.com` (or similar) at any registrar, then in Vercel go to **Project → Settings → Domains → Add**. Follow the DNS instructions it shows. Then update the Site URL and Redirect URL from step 6 to the new domain.
 
 ---
+
+## Message notifications (installable app)
+The site can be installed to a phone's home screen and send a notification when someone messages you.
+Add these in Vercel → Settings → Environment Variables, then redeploy:
+- `NEXT_PUBLIC_VAPID_PUBLIC_KEY` and `VAPID_PRIVATE_KEY`: a key pair for notifications (generate with `npx web-push generate-vapid-keys`)
+- `SUPABASE_SECRET_KEY`: Supabase → Project Settings → API Keys → secret key. Keep it private; it's only used on the server.
+
+On iPhone, notifications work once the site is added to the Home Screen (Share → Add to Home Screen).
 
 ## Before you invite lots of people
 - **Email sending limits.** Supabase's built-in email sender only allows a handful of sign-in emails per hour. Before a big launch, connect a free email service such as Resend under **Authentication → Emails → SMTP Settings**, or lean on Google sign-in.

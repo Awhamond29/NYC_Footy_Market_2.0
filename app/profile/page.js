@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, PlayerCard } from '@/components/ui';
+import AppSetup from '@/components/AppSetup';
 import { DAYS, squareJpeg } from '@/lib/format';
 
 export default function ProfilePage() {
@@ -265,7 +266,9 @@ function ProfileForm() {
           </p>
         </form>
 
-        <div className="panel stick">
+        <div className="stick" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <AppSetup variant="panel" />
+        <div className="panel">
           <span className="lbl">Preview: how your card looks</span>
           <PlayerCard p={{ ...f, name: f.name || 'Your name' }} isMe as="div" showRating={false} />
           <p className="note" style={{ margin: 0 }}>
@@ -274,6 +277,7 @@ function ProfileForm() {
               Sign out
             </button>
           </p>
+        </div>
         </div>
       </div>
     </section>
