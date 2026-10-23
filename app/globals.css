@@ -98,6 +98,23 @@ button.card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px -14px v
 
 .cardfoot .days { flex-wrap: nowrap; }
 
+/* Install page + Get the app bar */
+.install { max-width: 560px; display: flex; flex-direction: column; gap: 16px; padding-top: 12px; }
+.install-icon { width: 96px; height: 96px; border-radius: 22px; box-shadow: 0 10px 30px -12px var(--glow); }
+.install-steps { margin: 0; padding-left: 22px; display: grid; gap: 12px; font-size: 16px; }
+.install-steps b { color: var(--bib); }
+.install-desktop { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.install-qr { width: 200px; height: 200px; border-radius: 12px; }
+.btn.big { padding: 14px 18px; font-size: 16px; }
+.getapp-spacer { height: 76px; }
+.getapp { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; display: flex; align-items: center; gap: 12px;
+  background: var(--surface-2); border-top: 1px solid var(--glow); box-shadow: 0 -8px 24px -12px var(--glow);
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
+.getapp img { border-radius: 10px; flex: none; }
+.getapp-text { display: flex; flex-direction: column; min-width: 0; flex: 1; font-size: 13px; line-height: 1.25; }
+.getapp-text span { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.getapp-close { background: none; border: 0; color: var(--muted); font-size: 16px; padding: 6px; cursor: pointer; }
+
 /* Buttons */
 .btn { white-space: nowrap; font: 700 14px var(--body); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--bib); color: var(--on-accent); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }

@@ -61,6 +61,7 @@ export default function AppSetup({ variant = 'panel' }) {
           </li>
           <li>Open NYC Footy Market from your home screen and turn on notifications here</li>
         </ol>
+        <a href="/install" className="note">Step-by-step guide</a>
       </>
     );
   } else if (status === 'off') {

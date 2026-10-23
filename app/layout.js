@@ -2,6 +2,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { AuthProvider } from './providers';
 import Header from '@/components/Header';
+import GetAppBar from '@/components/GetAppBar';
 
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nycfootymarket.com';
 const DESCRIPTION =
@@ -48,6 +49,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           <Header />
           <main className="wrap">{children}</main>
+          <GetAppBar />
         </AuthProvider>
         <Analytics />
       </body>
