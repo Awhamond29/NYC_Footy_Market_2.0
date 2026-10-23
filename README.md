@@ -48,6 +48,11 @@ Also run `supabase/003_push.sql`. Then add three more environment variables in V
 ### 2d. Let guests browse
 Also run `supabase/004_guest_access.sql`. It lets people who aren't signed in see listed players, games and ratings. Phone numbers, Venmo and chats stay members-only.
 
+### 2e. Official support account
+Run `supabase/005_support.sql`. Then sign up on the site with the email you'll use for support, name the account "NYC Footy Market", and run in the SQL Editor:
+`select public.set_support_account('that-email');`
+Optional, to welcome people who joined earlier: `select public.welcome_existing_users();`
+
 ### 3. Copy your two keys
 In Supabase go to **Project Settings → API Keys** (on some projects it's **Settings → API**). Copy:
 - **Project URL**: looks like `https://abcdefgh.supabase.co`

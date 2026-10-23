@@ -11,6 +11,8 @@ import { ReviewsSection } from '@/components/Reviews';
 import AppSetup from '@/components/AppSetup';
 import { notifyRecipient } from '@/lib/push';
 import { firstName, msgTime } from '@/lib/format';
+import { Linkified, OfficialBadge, useSupportId } from '@/lib/support';
+import SupportButton from '@/components/SupportButton';
 
 export default function ChatsPage() {
   return (
@@ -24,6 +26,7 @@ const CONVO_SELECT =
   '*, a:profiles!conversations_user_a_fkey(id, name, photo_url, position, area), b:profiles!conversations_user_b_fkey(id, name, photo_url, position, area), game:games(title, field, kickoff)';
 
 function Chats() {
+  const supportId = useSupportId();
   const params = useParams();
   const activeId = params?.id?.[0] ?? null;
   const { user } = useAuth();
@@ -61,7 +64,10 @@ function Chats() {
         <div className="threads">
           {convos === null ? <div className="empty">Loading…</div> : null}
           {convos && convos.length === 0 ? (
-            <div className="empty">No chats yet. Message a player or ask to join a game.</div>
+            <div className="empty">
+              <p style={{ margin: 0 }}>No chats yet. Message a player or ask to join a game.</p>
+              <SupportButton variant="link" />
+            </div>
           ) : null}
           {(convos ?? []).map((c) => {
             const o = other(c);
@@ -76,7 +82,7 @@ function Chats() {
                 <Avatar name={o?.name} photo={o?.photo_url} size="sm" />
                 <div>
                   <div className="name" style={{ fontSize: 15 }}>
-                    {o?.name || 'Player'}
+                    {o?.name || 'Player'} {o?.id && o.id === supportId ? <OfficialBadge /> : null}
                   </div>
                   <div className="last">
                     {c.last_message
@@ -102,6 +108,8 @@ function Chats() {
 }
 
 function Conversation({ convo, other, onRead }) {
+  const supportId = useSupportId();
+  const isSupport = Boolean(other?.id) && other.id === supportId;
   const { user, refreshUnread } = useAuth();
   const [messages, setMessages] = useState(null);
   const [text, setText] = useState('');
@@ -218,10 +226,12 @@ function Conversation({ convo, other, onRead }) {
         <Avatar name={other?.name} photo={other?.photo_url} size="sm" />
         <div style={{ minWidth: 0 }}>
           <div className="name" style={{ fontSize: 15 }}>
-            {other?.name || 'Player'}
+            {other?.name || 'Player'} {isSupport ? <OfficialBadge /> : null}
           </div>
           <div className="meta">
-            {convo.game
+            {isSupport
+              ? 'Support · replies usually within a day'
+              : convo.game
               ? `${convo.game.title} · ${convo.game.field}`
               : [other?.position === 'GK' ? 'Goalkeeper' : 'Outfielder', other?.area].filter(Boolean).join(' · ')}
           </div>
@@ -248,7 +258,7 @@ function Conversation({ convo, other, onRead }) {
         ) : null}
         {(messages ?? []).map((m) => (
           <div key={m.id} className={`msg ${m.sender_id === user.id ? 'me' : 'them'}`}>
-            {m.body}
+            <Linkified text={m.body} />
             <time dateTime={m.created_at}>{msgTime(m.created_at)}</time>
           </div>
         ))}

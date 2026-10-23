@@ -7,6 +7,7 @@ import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, PlayerCard } from '@/components/ui';
 import AppSetup from '@/components/AppSetup';
+import SupportButton from '@/components/SupportButton';
 import { takeReturnTo } from '@/lib/returnTo';
 import { DAYS, squareJpeg } from '@/lib/format';
 
@@ -269,6 +270,7 @@ function ProfileForm() {
 
         <div className="stick" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         <AppSetup variant="panel" />
+        <SupportButton />
         <div className="panel">
           <span className="lbl">Preview: how your card looks</span>
           <PlayerCard p={{ ...f, name: f.name || 'Your name' }} isMe as="div" showRating={false} />

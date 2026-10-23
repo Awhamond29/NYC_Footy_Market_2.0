@@ -115,6 +115,10 @@ button.card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px -14px v
 .getapp-text span { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .getapp-close { background: none; border: 0; color: var(--muted); font-size: 16px; padding: 6px; cursor: pointer; }
 
+.official { display: inline-block; font: 700 10px var(--body); letter-spacing: .06em; text-transform: uppercase; color: var(--on-accent); background: var(--bib); border-radius: 999px; padding: 2px 7px; vertical-align: 2px; white-space: nowrap; }
+.msglink { color: inherit; text-decoration: underline; text-underline-offset: 2px; word-break: break-all; }
+.msg.them .msglink { color: var(--bib); }
+
 /* Buttons */
 .btn { white-space: nowrap; font: 700 14px var(--body); border: 0; border-radius: 10px; padding: 10px 16px; cursor: pointer; background: var(--bib); color: var(--on-accent); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
