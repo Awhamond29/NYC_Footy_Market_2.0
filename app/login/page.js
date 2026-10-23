@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase, isConfigured } from '@/lib/supabase';
 import { useAuth } from '@/app/providers';
 import { SetupNotice } from '@/components/RequireAuth';
+import { takeReturnTo } from '@/lib/returnTo';
 
 export default function Login() {
   const { session } = useAuth();
@@ -16,7 +17,7 @@ export default function Login() {
   const [code, setCode] = useState('');
 
   useEffect(() => {
-    if (session) router.replace('/players');
+    if (session) router.replace(takeReturnTo());
   }, [session, router]);
 
   const redirectTo = () => `${window.location.origin}/auth/callback`;
@@ -64,16 +65,16 @@ export default function Login() {
       return;
     }
     const { data: p } = await supabase.from('profiles').select('is_adult').eq('id', data.user.id).maybeSingle();
-    router.replace(p?.is_adult ? '/players' : '/profile?welcome=1');
+    router.replace(p?.is_adult ? takeReturnTo() : '/profile?welcome=1');
   };
 
   if (!isConfigured) return <SetupNotice />;
 
   return (
     <div className="panel login">
-      <h1>Sign in</h1>
+      <h1>Create an account or sign in</h1>
       <p className="sub" style={{ margin: 0 }}>
-        New here? Signing in creates your account.
+        New here? This creates your free account. Already a member? It signs you in.
       </p>
 
       <button className="btn dark block" type="button" onClick={google}>

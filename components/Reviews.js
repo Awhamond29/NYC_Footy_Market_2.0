@@ -27,7 +27,7 @@ export function ReviewsSection({ player, stats, onChanged }) {
   const [reviews, setReviews] = useState(null);
   const [canReview, setCanReview] = useState(false);
   const [writing, setWriting] = useState(false);
-  const isMe = player.id === user.id;
+  const isMe = Boolean(user) && player.id === user.id;
 
   const load = useCallback(async () => {
     const { data } = await supabase
@@ -40,15 +40,15 @@ export function ReviewsSection({ player, stats, onChanged }) {
   }, [player.id]);
 
   useEffect(() => {
-    if (isMe) return;
+    if (isMe || !user) return;
     supabase.rpc('can_review', { target: player.id }).then(({ data }) => setCanReview(Boolean(data)));
-  }, [player.id, isMe]);
+  }, [player.id, isMe, user]);
 
   useEffect(() => {
     if (open && reviews === null) load();
   }, [open, reviews, load]);
 
-  const mine = reviews?.find((r) => r.reviewer_id === user.id);
+  const mine = user ? reviews?.find((r) => r.reviewer_id === user.id) : undefined;
   const count = stats?.review_count ?? 0;
 
   return (
@@ -77,7 +77,7 @@ export function ReviewsSection({ player, stats, onChanged }) {
         </div>
       </div>
 
-      {!isMe && !canReview && count === 0 ? (
+      {user && !isMe && !canReview && count === 0 ? (
         <p className="note" style={{ margin: 0 }}>
           You can review {firstName(player.name)} after you&apos;ve messaged each other.
         </p>

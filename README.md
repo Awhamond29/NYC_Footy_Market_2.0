@@ -45,6 +45,9 @@ Also run `supabase/002_reviews.sql` the same way (SQL Editor → New query → p
 ### 2c. Load message notifications
 Also run `supabase/003_push.sql`. Then add three more environment variables in Vercel (see "Message notifications" below).
 
+### 2d. Let guests browse
+Also run `supabase/004_guest_access.sql`. It lets people who aren't signed in see listed players, games and ratings. Phone numbers, Venmo and chats stay members-only.
+
 ### 3. Copy your two keys
 In Supabase go to **Project Settings → API Keys** (on some projects it's **Settings → API**). Copy:
 - **Project URL**: looks like `https://abcdefgh.supabase.co`

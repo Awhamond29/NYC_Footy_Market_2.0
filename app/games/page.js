@@ -10,14 +10,14 @@ import { LEVELS, firstName, gameDate, soonLabel } from '@/lib/format';
 
 export default function GamesPage() {
   return (
-    <RequireAuth needsProfile>
+    <RequireAuth needsProfile allowGuest>
       <Games />
     </RequireAuth>
   );
 }
 
 function Games() {
-  const { user, profile, toast } = useAuth();
+  const { user, profile, toast, ensureSignedIn } = useAuth();
   const router = useRouter();
   const [games, setGames] = useState(null);
   const [error, setError] = useState('');
@@ -48,6 +48,7 @@ function Games() {
   }, [load]);
 
   const join = async (g) => {
+    if (!ensureSignedIn(`ask to join ${g.title}`)) return;
     if (!profile?.is_adult) {
       router.push('/profile');
       return;
@@ -89,7 +90,11 @@ function Games() {
         <button
           className="btn"
           type="button"
-          onClick={() => (profile?.is_adult ? setPosting(true) : router.push('/profile'))}
+          onClick={() => {
+            if (!ensureSignedIn('post a game')) return;
+            if (profile?.is_adult) setPosting(true);
+            else router.push('/profile');
+          }}
         >
           Post a game
         </button>
@@ -105,7 +110,7 @@ function Games() {
         {(games ?? []).map((g) => {
           const f = gameDate(g.kickoff);
           const soon = soonLabel(g.kickoff);
-          const mine = g.poster_id === user.id;
+          const mine = Boolean(user) && g.poster_id === user.id;
           return (
             <article className="game" key={g.id}>
               <div className="when">

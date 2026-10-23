@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { registerServiceWorker } from '@/lib/push';
+import SignUpPrompt from '@/components/SignUpPrompt';
 
 const AuthContext = createContext(null);
 
@@ -17,6 +18,7 @@ export function AuthProvider({ children }) {
   const [unread, setUnread] = useState(0);
   const [toastText, setToastText] = useState('');
   const [installPrompt, setInstallPrompt] = useState(null);
+  const [signupReason, setSignupReason] = useState(null);
   const toastTimer = useRef();
 
   const user = session?.user ?? null;
@@ -92,17 +94,30 @@ export function AuthProvider({ children }) {
     setInstallPrompt(null);
   }, [installPrompt]);
 
+  // Guests can browse; anything that needs an account calls this first.
+  const ensureSignedIn = useCallback(
+    (reason) => {
+      if (session?.user) return true;
+      setSignupReason(reason || '');
+      return false;
+    },
+    [session]
+  );
+
   const toast = useCallback((text) => {
     setToastText(text);
     clearTimeout(toastTimer.current);
     toastTimer.current = setTimeout(() => setToastText(''), 2600);
   }, []);
 
-  const value = { session, user, profile, refreshProfile, unread, refreshUnread, toast, installPrompt, installApp };
+  const value = { session, user, profile, refreshProfile, unread, refreshUnread, toast, installPrompt, installApp, ensureSignedIn };
 
   return (
     <AuthContext.Provider value={value}>
       {children}
+      {signupReason !== null && !session?.user ? (
+        <SignUpPrompt reason={signupReason} onClose={() => setSignupReason(null)} />
+      ) : null}
       {toastText ? (
         <div className="toast" role="status">
           {toastText}

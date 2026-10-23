@@ -4,7 +4,7 @@ export default function manifest() {
     name: 'NYC Footy Market',
     short_name: 'Footy Market',
     description: 'Find a keeper or outfielder for your NYC soccer game, or find a game to join.',
-    start_url: '/players',
+    start_url: '/',
     scope: '/',
     display: 'standalone',
     background_color: '#0f5132',

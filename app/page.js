@@ -24,14 +24,18 @@ export default function Home() {
           game. Players set their price, teams message them directly, and everyone pays each other by Venmo
           or cash. Free to use.
         </p>
-        <div className="row" style={{ flexWrap: 'wrap' }}>
+        <div className="choice">
           <Link href="/login" className="btn">
-            Sign up free
+            Create an account
           </Link>
-          <Link href="/login" className="btn ghost">
-            I already have an account
+          <Link href="/players" className="btn ghost">
+            Browse as a guest
           </Link>
         </div>
+        <p className="note" style={{ margin: 0 }}>
+          Already have an account? <Link href="/login">Sign in</Link>. Guests can see players and games; you need an
+          account to message people.
+        </p>
       </section>
 
       <div className="steps">

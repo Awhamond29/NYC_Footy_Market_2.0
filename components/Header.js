@@ -3,6 +3,12 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/app/providers';
+import { setReturnTo } from '@/lib/returnTo';
+
+const GUEST_TABS = [
+  { href: '/players', label: 'Players' },
+  { href: '/games', label: 'Short on Players' },
+];
 
 const TABS = [
   { href: '/players', label: 'Players' },
@@ -29,14 +35,14 @@ export default function Header() {
             <div className="tag">Short a keeper at Pier 40? Find one before kickoff.</div>
           </div>
           {session === null ? (
-            <Link href="/login" className="btn">
-              Sign in
+            <Link href="/login" className="btn" onClick={() => setReturnTo(window.location.pathname)}>
+              Create account
             </Link>
           ) : null}
         </div>
-        {session ? (
+        {session !== undefined ? (
           <nav className="tabs" aria-label="Sections">
-            {TABS.map((t) => (
+            {(session ? TABS : GUEST_TABS).map((t) => (
               <Link key={t.href} href={t.href} aria-current={pathname.startsWith(t.href) ? 'page' : undefined}>
                 {t.label}
                 {t.badge && unread > 0 ? <span className="count">{unread}</span> : null}

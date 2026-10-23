@@ -18,7 +18,7 @@ const FILTERS = [
 
 export default function PlayersPage() {
   return (
-    <RequireAuth needsProfile>
+    <RequireAuth needsProfile allowGuest>
       <Players />
     </RequireAuth>
   );
@@ -96,12 +96,12 @@ function Players() {
 
       <div className="grid">
         {shown.map((p) => (
-          <PlayerCard key={p.id} p={p} stats={stats[p.id]} isMe={p.id === user.id} onClick={() => setOpen(p)} />
+          <PlayerCard key={p.id} p={p} stats={stats[p.id]} isMe={Boolean(user) && p.id === user.id} onClick={() => setOpen(p)} />
         ))}
       </div>
 
       {open ? (
-        <PlayerModal p={open} stats={stats[open.id]} isMe={open.id === user.id} onClose={() => setOpen(null)} onReviewed={loadStats} />
+        <PlayerModal p={open} stats={stats[open.id]} isMe={Boolean(user) && open.id === user.id} onClose={() => setOpen(null)} onReviewed={loadStats} />
       ) : null}
     </section>
   );
@@ -109,7 +109,7 @@ function Players() {
 
 function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
   const router = useRouter();
-  const { toast, profile } = useAuth();
+  const { toast, profile, user, ensureSignedIn } = useAuth();
   const [contact, setContact] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -117,16 +117,18 @@ function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
   const [reason, setReason] = useState('');
 
   useEffect(() => {
+    if (!user) return; // contact details are for signed-in members only
     supabase
       .from('public_contacts')
       .select('phone, venmo')
       .eq('user_id', p.id)
       .maybeSingle()
       .then(({ data }) => setContact(data ?? {}));
-  }, [p.id]);
+  }, [p.id, user]);
 
   const message = async () => {
     setError('');
+    if (!ensureSignedIn(`message ${firstName(p.name)}`)) return;
     if (!profile?.is_adult) {
       router.push('/profile');
       return;
@@ -197,6 +199,11 @@ function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
       {venmo ? (
         <CopyLine label="Venmo" value={venmo} href={`https://venmo.com/u/${encodeURIComponent(venmoHandle)}`} onCopied={toast} />
       ) : null}
+      {!user ? (
+        <p className="note">
+          Create a free account to message {firstName(p.name)} and see their number and Venmo if they share them.
+        </p>
+      ) : null}
       {contact && !phone && !venmo && !isMe ? (
         <p className="note">This player keeps their number and Venmo private. Message them here and sort payment in the chat.</p>
       ) : null}
@@ -212,7 +219,7 @@ function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
       )}
       {error ? <p className="error">{error}</p> : null}
 
-      {!isMe ? (
+      {!isMe && user ? (
         reporting ? (
           <div className="field">
             <label htmlFor="reason">What happened?</label>

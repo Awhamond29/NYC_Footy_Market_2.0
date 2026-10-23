@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { takeReturnTo } from '@/lib/returnTo';
 
 // Google and email links land here. The Supabase client finishes the
 // sign-in from the URL on its own; we wait for it, then route the person.
@@ -17,7 +18,7 @@ export default function AuthCallback() {
       if (done || !session) return;
       done = true;
       const { data } = await supabase.from('profiles').select('is_adult').eq('id', session.user.id).maybeSingle();
-      router.replace(data?.is_adult ? '/players' : '/profile?welcome=1');
+      router.replace(data?.is_adult ? takeReturnTo() : '/profile?welcome=1');
     };
 
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => go(s));

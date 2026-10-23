@@ -188,6 +188,8 @@ dl.facts dd { margin: 0; }
 }
 
 /* Landing */
+.choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 260px)); gap: 10px; }
+.choice .btn { padding: 14px 18px; font-size: 16px; }
 .hero { padding-block: 36px 12px; display: grid; gap: 18px; max-width: 760px; }
 .hero h1 { font-size: clamp(40px, 8vw, 72px); }
 .hero h1 span { color: var(--bib); }

@@ -7,6 +7,7 @@ import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, PlayerCard } from '@/components/ui';
 import AppSetup from '@/components/AppSetup';
+import { takeReturnTo } from '@/lib/returnTo';
 import { DAYS, squareJpeg } from '@/lib/format';
 
 export default function ProfilePage() {
@@ -122,7 +123,7 @@ function ProfileForm() {
     }
     await refreshProfile();
     toast(f.listed ? 'Saved. You’re listed in Players.' : 'Saved. You’re hidden from Players.');
-    if (welcome && f.is_adult) router.push('/players');
+    if (welcome && f.is_adult) router.push(takeReturnTo());
   };
 
   const signOut = async () => {
