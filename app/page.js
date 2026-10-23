@@ -16,6 +16,7 @@ export default function Home() {
   return (
     <>
       <section className="hero">
+        <img src="/brand/logo.webp" alt="NYC Footy Market" className="hero-logo" width="1000" height="667" />
         <h1>
           Short on numbers? <span>Fill the spot.</span>
         </h1>

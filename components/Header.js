@@ -25,17 +25,22 @@ export default function Header() {
     <header className="top">
       <div className="wrap">
         <div className="brand">
-          <div style={{ minWidth: 0 }}>
-            <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 8 }}>
-              <Link href="/" className="logo">
-                NYC Footy <span>Market</span>
-              </Link>
-              <span className="beta">Beta</span>
+          <div className="brandleft">
+            <Link href="/" aria-label="NYC Footy Market home">
+              <img src="/brand/mark.png" alt="" className="mark" width="52" height="52" />
+            </Link>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', columnGap: 8 }}>
+                <Link href="/" className="logo">
+                  NYC Footy <span>Market</span>
+                </Link>
+                <span className="beta">Beta</span>
+              </div>
+              <div className="tag">Short a keeper at Pier 40? Find one before kickoff.</div>
             </div>
-            <div className="tag">Short a keeper at Pier 40? Find one before kickoff.</div>
           </div>
           {session === null ? (
-            <Link href="/login" className="btn" onClick={() => setReturnTo(window.location.pathname)}>
+            <Link href="/login" className="btn hdr" onClick={() => setReturnTo(window.location.pathname)}>
               Create account
             </Link>
           ) : null}
