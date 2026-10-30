@@ -175,7 +175,11 @@ function PostGame({ onClose, onPosted }) {
   const [f, setF] = useState({ title: '', field: '', kickoff: defaultKickoff(), need_gk: 0, need_of: 1, level: 'Intermediate', note: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+  // Editing any field clears an old error, so it doesn't linger after it's fixed.
+  const set = (k) => (e) => {
+    setF({ ...f, [k]: e.target.value });
+    if (error) setError('');
+  };
 
   const submit = async (e) => {
     e.preventDefault();
