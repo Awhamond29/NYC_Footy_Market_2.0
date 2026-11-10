@@ -53,6 +53,9 @@ Run `supabase/005_support.sql`. Then sign up on the site with the email you'll u
 `select public.set_support_account('that-email');`
 Optional, to welcome people who joined earlier: `select public.welcome_existing_users();`
 
+### 2f. Entrance fees on games
+Run `supabase/006_entry_fee.sql`. It lets captains set what each joining player pays (0 = free).
+
 ### 3. Copy your two keys
 In Supabase go to **Project Settings → API Keys** (on some projects it's **Settings → API**). Copy:
 - **Project URL**: looks like `https://abcdefgh.supabase.co`

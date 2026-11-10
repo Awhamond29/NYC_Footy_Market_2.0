@@ -141,6 +141,11 @@ button.card:hover { transform: translateY(-2px); box-shadow: 0 10px 28px -14px v
 .gbody { padding: 14px 16px; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
 .gtitle { font-weight: 700; font-size: 16px; }
 .needs { display: flex; gap: 6px; flex-wrap: wrap; }
+.pos.fee { background: var(--bib-soft); color: var(--bib); }
+.pos.free { background: var(--surface-2); color: var(--muted); }
+.moneyinput { display: flex; align-items: center; gap: 8px; }
+.moneyinput span { font: 800 20px var(--display); color: var(--muted); }
+.moneyinput input { max-width: 140px; }
 .soon { font: 600 11px var(--body); color: var(--bib); background: var(--bib-soft); padding: 3px 8px; border-radius: 999px; }
 .gact { padding: 14px; display: flex; align-items: center; }
 @media (max-width: 560px) {

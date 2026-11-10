@@ -132,6 +132,11 @@ function Games() {
                 <div className="needs">
                   {g.need_gk ? <span className="pos gk">Need {g.need_gk} GK</span> : null}
                   {g.need_of ? <span className="pos of">Need {g.need_of} outfield</span> : null}
+                  {g.entry_fee > 0 ? (
+                    <span className="pos fee">${g.entry_fee} to play</span>
+                  ) : g.entry_fee === 0 ? (
+                    <span className="pos free">Free to play</span>
+                  ) : null}
                 </div>
                 {g.note ? <p style={{ margin: 0, fontSize: 14 }}>{g.note}</p> : null}
               </div>
@@ -172,7 +177,7 @@ function defaultKickoff() {
 }
 
 function PostGame({ onClose, onPosted }) {
-  const [f, setF] = useState({ title: '', field: '', kickoff: defaultKickoff(), need_gk: 0, need_of: 1, level: 'Intermediate', note: '' });
+  const [f, setF] = useState({ title: '', field: '', kickoff: defaultKickoff(), need_gk: 0, need_of: 1, entry_fee: 0, level: 'Intermediate', note: '' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   // Editing any field clears an old error, so it doesn't linger after it's fixed.
@@ -186,6 +191,7 @@ function PostGame({ onClose, onPosted }) {
     const at = new Date(f.kickoff);
     const gk = Number(f.need_gk) || 0;
     const of = Number(f.need_of) || 0;
+    const fee = Math.round(Number(f.entry_fee) || 0);
     const err = !f.title.trim()
       ? 'Add a name for the game.'
       : !f.field.trim()
@@ -194,13 +200,15 @@ function PostGame({ onClose, onPosted }) {
           ? 'Pick a kickoff time in the future.'
           : gk + of === 0
             ? 'Say how many players you need.'
-            : '';
+            : fee < 0 || fee > 200
+              ? 'Set an entrance fee between $0 and $200.'
+              : '';
     if (err) {
       setError(err);
       return;
     }
     setBusy(true);
-    const { error } = await supabase.from('games').insert({
+    const game = {
       title: f.title.trim(),
       field: f.field.trim(),
       kickoff: at.toISOString(),
@@ -208,7 +216,14 @@ function PostGame({ onClose, onPosted }) {
       need_of: of,
       level: f.level,
       note: f.note.trim(),
-    });
+      entry_fee: fee,
+    };
+    let { error } = await supabase.from('games').insert(game);
+    if (error && /entry_fee/.test(error.message || '')) {
+      // Database not updated yet (006_entry_fee.sql): post without the fee.
+      const { entry_fee, ...withoutFee } = game;
+      ({ error } = await supabase.from('games').insert(withoutFee));
+    }
     setBusy(false);
     if (error) setError('Couldn’t post the game. Check the details and try again.');
     else onPosted();
@@ -239,6 +254,14 @@ function PostGame({ onClose, onPosted }) {
             <label htmlFor="gOF">Outfielders needed</label>
             <input id="gOF" type="number" min="0" max="11" value={f.need_of} onChange={set('need_of')} />
           </div>
+        </div>
+        <div className="field">
+          <label htmlFor="gFee">Entrance fee per player</label>
+          <div className="moneyinput">
+            <span>$</span>
+            <input id="gFee" type="number" inputMode="numeric" min="0" max="200" step="1" value={f.entry_fee} onChange={set('entry_fee')} />
+          </div>
+          <span className="note">What each player who joins pays to play. Leave at 0 if it&apos;s free.</span>
         </div>
         <div className="field">
           <label htmlFor="gLevel">Level</label>
