@@ -47,6 +47,14 @@ select, input, textarea { font: 500 14px var(--body); color: var(--ink); backgro
 select.auto { width: auto; }
 textarea { resize: vertical; min-height: 80px; }
 
+/* Day filter */
+.dayfilter { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; margin: -6px 0 10px; min-width: 0; }
+.daychips { display: flex; flex-wrap: wrap; gap: 6px; min-width: 0; }
+.daychips button { flex: none; font: 600 13px var(--body); border: 1px solid var(--line); background: var(--surface); color: var(--muted); padding: 7px 11px; border-radius: 999px; cursor: pointer; }
+.daychips button.today { border-color: #2a4470; color: var(--ink); }
+.daychips button[aria-pressed="true"] { background: var(--bib); border-color: var(--bib); color: var(--on-accent); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
 /* Player cards */
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
 .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 10px; text-align: left; font: inherit; color: inherit; width: 100%; }

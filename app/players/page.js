@@ -8,7 +8,7 @@ import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, CopyLine, Days, Modal, PlayerCard, PosBadge, Price } from '@/components/ui';
 import { ReviewsSection } from '@/components/Reviews';
-import { firstName } from '@/lib/format';
+import { DAYS, firstName } from '@/lib/format';
 
 const FILTERS = [
   { key: 'all', label: 'All Players' },
@@ -29,6 +29,9 @@ function Players() {
   const [players, setPlayers] = useState(null);
   const [error, setError] = useState('');
   const [pos, setPos] = useState('all');
+  const [days, setDays] = useState([]); // empty = any day
+  const today = DAYS[(new Date().getDay() + 6) % 7];
+  const toggleDay = (d) => setDays((cur) => (cur.includes(d) ? cur.filter((x) => x !== d) : DAYS.filter((x) => x === d || cur.includes(x))));
   const [sort, setSort] = useState('desc');
   const [open, setOpen] = useState(null);
   const [stats, setStats] = useState({});
@@ -51,14 +54,16 @@ function Players() {
   }, [load]);
 
   const shown = useMemo(() => {
-    const list = (players ?? []).filter((p) => pos === 'all' || p.position === pos);
+    const list = (players ?? []).filter(
+      (p) => (pos === 'all' || p.position === pos) && (days.length === 0 || (p.days ?? []).some((d) => days.includes(d)))
+    );
     if (sort === 'rating') {
       // Best average first; players with more reviews win ties; unrated players go last.
       const score = (p) => stats[p.id] ? Number(stats[p.id].avg_rating) * 1000 + stats[p.id].review_count : -1;
       return list.sort((a, b) => score(b) - score(a));
     }
     return list.sort((a, b) => (sort === 'desc' ? b.price - a.price : a.price - b.price));
-  }, [players, pos, sort, stats]);
+  }, [players, pos, sort, stats, days]);
 
   return (
     <section>
@@ -83,14 +88,48 @@ function Players() {
         </select>
       </div>
 
+      <div className="dayfilter" role="group" aria-label="Filter by day available">
+        <span className="lbl">Available</span>
+        <div className="daychips">
+          <button type="button" aria-pressed={days.length === 0} onClick={() => setDays([])}>
+            Any day
+          </button>
+          {DAYS.map((d) => (
+            <button key={d} type="button" aria-pressed={days.includes(d)} onClick={() => toggleDay(d)} className={d === today ? 'today' : undefined}>
+              {d}
+              {d === today ? <span className="sr-only"> (today)</span> : null}
+            </button>
+          ))}
+        </div>
+      </div>
+      {players && players.length > 0 ? (
+        <p className="note" style={{ margin: '0 0 12px' }}>
+          {shown.length} {shown.length === 1 ? 'player' : 'players'}
+          {days.length ? ` available ${days.join(', ')}` : ''}
+        </p>
+      ) : null}
+
       {error ? <p className="error">{error}</p> : null}
       {players === null && !error ? <div className="empty">Loading players…</div> : null}
       {players && shown.length === 0 ? (
         <div className="empty">
-          <p>No {pos === 'GK' ? 'goalkeepers' : pos === 'OF' ? 'outfielders' : 'players'} listed yet.</p>
-          <Link href="/profile" className="btn">
-            List yourself
-          </Link>
+          {days.length ? (
+            <>
+              <p>
+                No {pos === 'GK' ? 'goalkeepers' : pos === 'OF' ? 'outfielders' : 'players'} available {days.join(', ')} yet.
+              </p>
+              <button className="btn ghost" type="button" onClick={() => setDays([])}>
+                Show any day
+              </button>
+            </>
+          ) : (
+            <>
+              <p>No {pos === 'GK' ? 'goalkeepers' : pos === 'OF' ? 'outfielders' : 'players'} listed yet.</p>
+              <Link href="/profile" className="btn">
+                List yourself
+              </Link>
+            </>
+          )}
         </div>
       ) : null}
 
