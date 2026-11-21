@@ -14,6 +14,7 @@ import { firstName, msgTime } from '@/lib/format';
 import { Linkified, OfficialBadge, useSupportId } from '@/lib/support';
 import SupportButton from '@/components/SupportButton';
 import VenmoPay, { payNote } from '@/components/VenmoPay';
+import { DealBanner, DealForm, useDeal } from '@/components/Deals';
 
 export default function ChatsPage() {
   return (
@@ -121,6 +122,10 @@ function Conversation({ convo, other, onRead }) {
   const [otherStats, setOtherStats] = useState(null);
   const [otherVenmo, setOtherVenmo] = useState(null);
   const [paying, setPaying] = useState(false);
+  const [dealing, setDealing] = useState(false);
+  const dealState = useDeal(convo.id, isSupport);
+  const dealRefresh = useRef();
+  dealRefresh.current = dealState.reload;
   const listRef = useRef();
   const inputRef = useRef();
 
@@ -156,7 +161,10 @@ function Conversation({ convo, other, onRead }) {
         { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${convo.id}` },
         (payload) => {
           setMessages((m) => (m && !m.some((x) => x.id === payload.new.id) ? [...m, payload.new] : m));
-          if (payload.new.sender_id !== user.id) markRead();
+          if (payload.new.sender_id !== user.id) {
+            markRead();
+            dealRefresh.current?.();
+          }
         }
       )
       .subscribe();
@@ -209,26 +217,32 @@ function Conversation({ convo, other, onRead }) {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages]);
 
+  const post = async (body) => {
+    const { data, error } = await supabase
+      .from('messages')
+      .insert({ conversation_id: convo.id, body })
+      .select()
+      .single();
+    if (error) return false;
+    setMessages((m) => (m && !m.some((x) => x.id === data.id) ? [...m, data] : m));
+    notifyRecipient(data.id);
+    onRead();
+    return true;
+  };
+
   const send = async (e) => {
     e.preventDefault();
     const body = text.trim();
     if (!body) return;
     setError('');
     setSending(true);
-    const { data, error } = await supabase
-      .from('messages')
-      .insert({ conversation_id: convo.id, body })
-      .select()
-      .single();
+    const ok = await post(body);
     setSending(false);
-    if (error) {
+    if (!ok) {
       setError('Message not sent. You may have been blocked, or the connection dropped.');
       return;
     }
     setText('');
-    setMessages((m) => (m && !m.some((x) => x.id === data.id) ? [...m, data] : m));
-    notifyRecipient(data.id);
-    onRead();
   };
 
   return (
@@ -251,6 +265,11 @@ function Conversation({ convo, other, onRead }) {
           </div>
         </div>
         <div className="headbtns">
+          {dealState.available && !dealState.pending ? (
+            <button className="btn ghost sm" type="button" onClick={() => setDealing(true)}>
+              ✅ Deal
+            </button>
+          ) : null}
           {otherVenmo ? (
             <button className="btn ghost sm" type="button" onClick={() => setPaying(true)}>
               💸 Pay
@@ -263,6 +282,30 @@ function Conversation({ convo, other, onRead }) {
           ) : null}
         </div>
       </div>
+      {dealState.deal ? (
+        <DealBanner
+          deal={dealState.deal}
+          me={user.id}
+          other={other}
+          game={convo.game}
+          post={post}
+          reload={dealState.reload}
+          venmo={otherVenmo}
+          onReview={canReview ? openReview : null}
+        />
+      ) : null}
+      {dealing ? (
+        <DealForm
+          convo={convo}
+          other={other}
+          post={post}
+          onClose={() => setDealing(false)}
+          onDone={() => {
+            setDealing(false);
+            dealState.reload();
+          }}
+        />
+      ) : null}
       {paying && otherVenmo ? (
         <Modal onClose={() => setPaying(false)} label={`Pay ${other.name} on Venmo`}>
           <div className="row">
