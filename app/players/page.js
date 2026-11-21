@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import VenmoPay, { payNote } from '@/components/VenmoPay';
 import { useAuth } from '@/app/providers';
 import RequireAuth from '@/components/RequireAuth';
 import { Avatar, CopyLine, Days, Modal, PlayerCard, PosBadge, Price } from '@/components/ui';
@@ -237,6 +238,9 @@ function PlayerModal({ p, stats, isMe, onClose, onReviewed }) {
       {phone ? <CopyLine label="Text / call" value={phone} href={`sms:${phone.replace(/[^\d+]/g, '')}`} onCopied={toast} /> : null}
       {venmo ? (
         <CopyLine label="Venmo" value={venmo} href={`https://venmo.com/u/${encodeURIComponent(venmoHandle)}`} onCopied={toast} />
+      ) : null}
+      {venmo && !isMe ? (
+        <VenmoPay handle={venmo} name={p.name} amount={p.price} note={payNote({ position: p.position })} />
       ) : null}
       {!user ? (
         <p className="note">

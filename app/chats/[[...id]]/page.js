@@ -13,6 +13,7 @@ import { notifyRecipient } from '@/lib/push';
 import { firstName, msgTime } from '@/lib/format';
 import { Linkified, OfficialBadge, useSupportId } from '@/lib/support';
 import SupportButton from '@/components/SupportButton';
+import VenmoPay, { payNote } from '@/components/VenmoPay';
 
 export default function ChatsPage() {
   return (
@@ -23,7 +24,7 @@ export default function ChatsPage() {
 }
 
 const CONVO_SELECT =
-  '*, a:profiles!conversations_user_a_fkey(id, name, photo_url, position, area), b:profiles!conversations_user_b_fkey(id, name, photo_url, position, area), game:games(title, field, kickoff)';
+  '*, a:profiles!conversations_user_a_fkey(id, name, photo_url, position, area, price), b:profiles!conversations_user_b_fkey(id, name, photo_url, position, area, price), game:games(title, field, kickoff)';
 
 function Chats() {
   const supportId = useSupportId();
@@ -118,6 +119,8 @@ function Conversation({ convo, other, onRead }) {
   const [canReview, setCanReview] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [otherStats, setOtherStats] = useState(null);
+  const [otherVenmo, setOtherVenmo] = useState(null);
+  const [paying, setPaying] = useState(false);
   const listRef = useRef();
   const inputRef = useRef();
 
@@ -174,6 +177,17 @@ function Conversation({ convo, other, onRead }) {
     // markRead is stable per conversation; re-subscribing on every list refresh would drop messages.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [convo.id, user.id]);
+
+  // If they share their Venmo publicly, offer a one-tap pay link.
+  useEffect(() => {
+    if (!other?.id || isSupport) return;
+    supabase
+      .from('public_contacts')
+      .select('venmo')
+      .eq('user_id', other.id)
+      .maybeSingle()
+      .then(({ data }) => setOtherVenmo(data?.venmo || null));
+  }, [other?.id, isSupport]);
 
   // Once you've both messaged, offer a review button (e.g. after the game).
   const otherId = other?.id;
@@ -236,12 +250,40 @@ function Conversation({ convo, other, onRead }) {
               : [other?.position === 'GK' ? 'Goalkeeper' : 'Outfielder', other?.area].filter(Boolean).join(' · ')}
           </div>
         </div>
-        {canReview ? (
-          <button className="btn ghost sm" type="button" onClick={openReview} style={{ marginLeft: 'auto' }}>
-            ★ Review
-          </button>
-        ) : null}
+        <div className="headbtns">
+          {otherVenmo ? (
+            <button className="btn ghost sm" type="button" onClick={() => setPaying(true)}>
+              💸 Pay
+            </button>
+          ) : null}
+          {canReview ? (
+            <button className="btn ghost sm" type="button" onClick={openReview}>
+              ★ Review
+            </button>
+          ) : null}
+        </div>
       </div>
+      {paying && otherVenmo ? (
+        <Modal onClose={() => setPaying(false)} label={`Pay ${other.name} on Venmo`}>
+          <div className="row">
+            <Avatar name={other.name} photo={other.photo_url} />
+            <div>
+              <h2>Pay {firstName(other.name)}</h2>
+              <div className="meta">Venmo {otherVenmo.startsWith('@') ? otherVenmo : `@${otherVenmo}`}</div>
+            </div>
+          </div>
+          <VenmoPay
+            handle={otherVenmo}
+            name={other.name}
+            amount={other.price}
+            note={payNote({ position: other.position, gameTitle: convo.game?.title })}
+          />
+          <p className="note">
+            Opens Venmo with the amount filled in. You still confirm the payment in Venmo. Only pay people you&apos;ve
+            agreed a game with, and check the name and photo in Venmo match.
+          </p>
+        </Modal>
+      ) : null}
       {reviewing && other ? (
         <Modal onClose={() => setReviewing(false)} label={`Review ${other.name}`}>
           <div className="row">

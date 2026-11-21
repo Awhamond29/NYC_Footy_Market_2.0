@@ -235,3 +235,13 @@ dl.facts dd { margin: 0; }
 
 @media (max-width: 400px) { .logo { font-size: 23px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Pay on Venmo */
+.headbtns { margin-left: auto; display: flex; gap: 6px; flex: none; }
+.venmopay { display: flex; gap: 8px; align-items: stretch; }
+.venmopay .amount { display: flex; align-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 0 10px; width: 92px; flex: none; }
+.venmopay .amount span { font: 700 16px var(--body); color: var(--muted); }
+.venmopay .amount input { border: 0; background: none; padding: 10px 0; font: 700 16px var(--body); width: 100%; }
+.venmopay .amount input:focus { outline: none; }
+.venmopay .amount:focus-within { border-color: var(--bib); }
+.btn.venmo { flex: 1; background: #008cff; color: #fff; font-size: 15px; }
