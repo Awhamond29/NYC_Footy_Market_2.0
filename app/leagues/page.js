@@ -23,6 +23,7 @@ export default function LeaguesPage() {
 const FORMATS = ['5v5', '6v6', '7v7', '8v8', '9v9', '11v11'];
 const GENDERS = ['Coed', "Men's", "Women's", 'Open'];
 const LEAGUE_LEVELS = ['Recreational', 'Intermediate', 'Competitive'];
+const SETTINGS = { Outdoor: 'Outdoor', Indoor: 'Indoor', Both: 'Indoor & outdoor' };
 
 const money = (n) => `$${Number(n || 0).toLocaleString('en-US')}`;
 const shortDate = (d) =>
@@ -140,6 +141,7 @@ function Leagues() {
                   <span className="pos of">{l.format}</span>
                   <span className="pos plain">{l.gender}</span>
                   <span className="pos plain">{l.level}</span>
+                  {l.setting ? <span className="pos plain">{SETTINGS[l.setting]}</span> : null}
                 </div>
                 <div className="meta">
                   {[l.area, l.game_day, l.contact_name ? `Run by ${l.contact_name}` : ''].filter(Boolean).join(' · ')}
@@ -233,6 +235,7 @@ function LeagueDetail({ league: l, stats, onClose, onEdit, onChanged }) {
             <span className="pos of">{l.format}</span>
             <span className="pos plain">{l.gender}</span>
             <span className="pos plain">{l.level}</span>
+            {l.setting ? <span className="pos plain">{SETTINGS[l.setting]}</span> : null}
           </div>
         </div>
       </div>
@@ -351,6 +354,7 @@ function LeagueForm({ existing, onClose, onSaved }) {
     format: existing?.format ?? '7v7',
     gender: existing?.gender ?? 'Coed',
     level: existing?.level ?? 'Recreational',
+    setting: existing?.setting ?? 'Outdoor',
     area: existing?.area ?? '',
     game_day: existing?.game_day ?? '',
     season_start: existing?.season_start ?? '',
@@ -417,6 +421,7 @@ function LeagueForm({ existing, onClose, onSaved }) {
       format: f.format,
       gender: f.gender,
       level: f.level,
+      setting: f.setting,
       area: f.area.trim(),
       game_day: f.game_day.trim(),
       season_start: f.season_start || null,
@@ -428,9 +433,13 @@ function LeagueForm({ existing, onClose, onSaved }) {
       signup_url: url,
       description: f.description.trim(),
     };
-    const { error } = existing
-      ? await supabase.from('leagues').update(row).eq('id', existing.id)
-      : await supabase.from('leagues').insert(row);
+    const save = (r) => (existing ? supabase.from('leagues').update(r).eq('id', existing.id) : supabase.from('leagues').insert(r));
+    let { error } = await save(row);
+    if (error && /setting/.test(error.message || '')) {
+      // Database not updated yet (009_league_setting.sql): save without indoor/outdoor.
+      const { setting, ...rest } = row;
+      ({ error } = await save(rest));
+    }
     if (error) {
       setBusy(false);
       setError('Couldn’t save the league. Check the details and try again.');
@@ -491,6 +500,16 @@ function LeagueForm({ existing, onClose, onSaved }) {
             {GENDERS.map((x) => (
               <button key={x} type="button" aria-pressed={f.gender === x} onClick={() => pick('gender', x)}>
                 {x}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="field">
+          <span className="lbl">Indoor or outdoor</span>
+          <div className="seg" role="group" aria-label="Indoor or outdoor">
+            {Object.entries(SETTINGS).map(([k, label]) => (
+              <button key={k} type="button" aria-pressed={f.setting === k} onClick={() => pick('setting', k)}>
+                {label}
               </button>
             ))}
           </div>
