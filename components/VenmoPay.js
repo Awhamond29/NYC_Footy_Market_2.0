@@ -18,10 +18,10 @@ export function payNote({ position, gameTitle } = {}) {
   return ['NYC Footy Market', gameTitle || role].filter(Boolean).join(' - ');
 }
 
-export default function VenmoPay({ handle, name, amount: start = 0, note, compact = false }) {
+export default function VenmoPay({ handle, name, amount: start = 0, note, compact = false, max = 500, label }) {
   const [amount, setAmount] = useState(start > 0 ? String(start) : '');
   if (!handle) return null;
-  const value = Math.min(500, Math.max(0, Math.round(Number(amount) || 0)));
+  const value = Math.min(max, Math.max(0, Math.round(Number(amount) || 0)));
   const who = firstName(name) || 'them';
 
   return (
@@ -31,12 +31,12 @@ export default function VenmoPay({ handle, name, amount: start = 0, note, compac
         <input
           inputMode="numeric"
           value={amount}
-          onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, '').slice(0, 3))}
+          onChange={(e) => setAmount(e.target.value.replace(/[^\d]/g, '').slice(0, String(max).length))}
           placeholder="0"
         />
       </label>
       <a className="btn venmo" href={venmoPayUrl(handle, value, note)} target="_blank" rel="noopener noreferrer">
-        {value > 0 ? `Pay ${who} $${value} on Venmo` : `Pay ${who} on Venmo`}
+        {label ? label(value) : value > 0 ? `Pay ${who} $${value} on Venmo` : `Pay ${who} on Venmo`}
       </a>
     </div>
   );

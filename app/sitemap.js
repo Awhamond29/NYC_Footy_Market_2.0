@@ -4,6 +4,7 @@ const SITE = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nycfootymarket.com
 export default function sitemap() {
   return [
     { url: `${SITE}/`, changeFrequency: 'weekly', priority: 1 },
+    { url: `${SITE}/leagues`, changeFrequency: 'daily', priority: 0.8 },
     { url: `${SITE}/install`, changeFrequency: 'monthly', priority: 0.6 },
     { url: `${SITE}/login`, changeFrequency: 'monthly', priority: 0.5 },
   ];

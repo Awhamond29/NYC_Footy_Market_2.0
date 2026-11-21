@@ -254,3 +254,24 @@ dl.facts dd { margin: 0; }
 .dealtext b { font-size: 14px; }
 .dealtext span { font-size: 13px; color: var(--muted); }
 @media (max-width: 480px) { .headbtns .btn.sm { padding: 6px 8px; } }
+
+/* Leagues */
+.leagues { display: flex; flex-direction: column; gap: 12px; }
+.league { display: grid; grid-template-columns: 72px 1fr auto; gap: 14px; align-items: center; text-align: left; width: 100%; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px; color: inherit; font: inherit; cursor: pointer; }
+.league:hover { border-color: var(--bib); }
+.lbody { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.lfee { display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.lfee b { font: 800 24px var(--display); color: var(--bib); line-height: 1; }
+.lfee small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.lbadge { width: 72px; height: 72px; border-radius: 14px; background: var(--surface-2) center / cover no-repeat; border: 1px solid var(--line); flex: none; }
+.lbadge.lg { width: 84px; height: 84px; }
+.lbadge.blank { display: grid; place-items: center; font: 800 26px var(--display); color: var(--bib); background: linear-gradient(145deg, var(--surface-2), var(--bg)); }
+.pos.plain { background: var(--surface-2); color: var(--muted); }
+.ldesc { margin: 0; white-space: pre-wrap; font-size: 14px; line-height: 1.55; }
+.lactions { display: flex; flex-direction: column; gap: 10px; }
+@media (max-width: 560px) {
+  .league { grid-template-columns: 56px 1fr; gap: 12px; }
+  .league .lbadge { width: 56px; height: 56px; }
+  .lfee { grid-column: 2; flex-direction: row; align-items: baseline; gap: 6px; }
+  .lfee b { font-size: 20px; }
+}

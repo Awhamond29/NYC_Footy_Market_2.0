@@ -8,11 +8,13 @@ import { setReturnTo } from '@/lib/returnTo';
 const GUEST_TABS = [
   { href: '/players', label: 'Players' },
   { href: '/games', label: 'Short on Players' },
+  { href: '/leagues', label: 'Leagues' },
 ];
 
 const TABS = [
   { href: '/players', label: 'Players' },
   { href: '/games', label: 'Short on Players' },
+  { href: '/leagues', label: 'Leagues' },
   { href: '/chats', label: 'Chats', badge: true },
   { href: '/profile', label: 'My Profile' },
 ];
