@@ -275,3 +275,8 @@ dl.facts dd { margin: 0; }
   .lfee { grid-column: 2; flex-direction: row; align-items: baseline; gap: 6px; }
   .lfee b { font-size: 20px; }
 }
+.deadline { align-self: flex-start; font: 700 12px var(--body); color: var(--muted); }
+.deadline.soon { color: #ffb547; }
+.deadline.closed { color: var(--danger); }
+dd .deadline { margin-left: 6px; }
+.league.closed { opacity: .6; }

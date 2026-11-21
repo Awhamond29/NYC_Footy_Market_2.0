@@ -29,6 +29,21 @@ const money = (n) => `$${Number(n || 0).toLocaleString('en-US')}`;
 const shortDate = (d) =>
   d ? new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
+// Sign-ups close at the end of the deadline day (New York time is close enough to the viewer's day).
+function deadlineInfo(d) {
+  if (!d) return null;
+  const end = new Date(`${d}T23:59:59`);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const days = Math.round((new Date(`${d}T00:00:00`) - today) / 864e5);
+  const date = new Date(`${d}T12:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (Date.now() > end.getTime()) return { closed: true, text: 'Sign-ups closed' };
+  if (days === 0) return { soon: true, text: 'Sign-ups close today' };
+  if (days === 1) return { soon: true, text: 'Sign-ups close tomorrow' };
+  if (days <= 7) return { soon: true, text: `Sign-ups close in ${days} days` };
+  return { text: `Sign-ups close ${date}` };
+}
+
 function LeagueBadge({ league, size = 'md' }) {
   if (league.photo_url) {
     return <div className={`lbadge ${size}`} style={{ backgroundImage: `url("${league.photo_url}")` }} aria-hidden="true" />;
@@ -90,7 +105,12 @@ function Leagues() {
     setEditing({});
   };
 
-  const shown = (leagues ?? []).filter((l) => filter === 'All' || l.format === filter);
+  // Open leagues first; ones whose sign-up deadline has passed go to the bottom.
+  const shown = (leagues ?? [])
+    .filter((l) => filter === 'All' || l.format === filter)
+    .map((l, i) => ({ l, i, closed: Boolean(deadlineInfo(l.signup_deadline)?.closed) }))
+    .sort((a, b) => a.closed - b.closed || a.i - b.i)
+    .map((x) => x.l);
   const formatsInUse = FORMATS.filter((f) => (leagues ?? []).some((l) => l.format === f));
   const current = open ? (leagues ?? []).find((l) => l.id === open) : null;
 
@@ -130,13 +150,19 @@ function Leagues() {
         {shown.map((l) => {
           const mine = Boolean(user) && l.manager_id === user.id;
           return (
-            <button className="league" type="button" key={l.id} onClick={() => setOpen(l.id)}>
+            <button
+              className={`league ${deadlineInfo(l.signup_deadline)?.closed ? 'closed' : ''}`}
+              type="button"
+              key={l.id}
+              onClick={() => setOpen(l.id)}
+            >
               <LeagueBadge league={l} />
               <div className="lbody">
                 <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
                   <span className="gtitle">{l.name}</span>
                   {!l.approved ? <span className="soon">Waiting for approval</span> : mine ? <span className="you">Your league</span> : null}
                 </div>
+                <Deadline date={l.signup_deadline} />
                 <div className="needs">
                   <span className="pos of">{l.format}</span>
                   <span className="pos plain">{l.gender}</span>
@@ -275,8 +301,10 @@ function LeagueDetail({ league: l, stats, onClose, onEdit, onChanged }) {
         ) : null}
         {l.signup_deadline ? (
           <>
-            <dt>Sign up by</dt>
-            <dd>{shortDate(l.signup_deadline)}</dd>
+            <dt>Sign-ups close</dt>
+            <dd>
+              {shortDate(l.signup_deadline)} <Deadline date={l.signup_deadline} inline />
+            </dd>
           </>
         ) : null}
         <dt>Manager</dt>
@@ -310,7 +338,7 @@ function LeagueDetail({ league: l, stats, onClose, onEdit, onChanged }) {
               Sign-up form ↗
             </a>
           ) : null}
-          {l.venmo && l.entry_fee > 0 ? (
+          {l.venmo && l.entry_fee > 0 && !deadlineInfo(l.signup_deadline)?.closed ? (
             <>
               <span className="lbl" style={{ marginTop: 4 }}>
                 Pay the entry fee
@@ -547,7 +575,7 @@ function LeagueForm({ existing, onClose, onSaved }) {
             <input id="lgStart" type="date" value={f.season_start} onChange={set('season_start')} />
           </div>
           <div className="field">
-            <label htmlFor="lgDeadline">Sign-up deadline (optional)</label>
+            <label htmlFor="lgDeadline">Sign-ups close (optional)</label>
             <input id="lgDeadline" type="date" value={f.signup_deadline} onChange={set('signup_deadline')} />
           </div>
         </div>
@@ -589,4 +617,11 @@ function LeagueForm({ existing, onClose, onSaved }) {
       </form>
     </Modal>
   );
+}
+
+function Deadline({ date, inline = false }) {
+  const d = deadlineInfo(date);
+  if (!d) return null;
+  if (inline) return d.closed || d.soon ? <span className={`deadline ${d.closed ? 'closed' : 'soon'}`}>{d.text}</span> : null;
+  return <span className={`deadline ${d.closed ? 'closed' : d.soon ? 'soon' : ''}`}>{d.text}</span>;
 }
